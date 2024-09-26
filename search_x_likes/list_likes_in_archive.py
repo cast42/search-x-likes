@@ -43,8 +43,8 @@ def load_likes(data_directory: str) -> list[dict[str, LikeInfo]]:
 
 
 def main() -> None:
-    data_directory = "/Users/lode/Downloads/data"  # Adjust this path if your data directory is elsewhere
-    likes = load_likes(data_directory)
+    DATA_DIRECTORY = "/Users/lode/Downloads/data"  # Adjust this path if your data directory is elsewhere
+    likes = load_likes(DATA_DIRECTORY)
     for like_obj in likes:
         like: LikeInfo = like_obj.get("like", {})
         tweet_id: str = like.get("tweetId", "N/A")
