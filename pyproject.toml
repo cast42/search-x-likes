@@ -1,7 +1,7 @@
 [project]
 name = "search-x-likes"
 version = "0.0.1"
-description = "Search posts from x that have liked yourself usign the archive download files"
+description = "Search posts from x that you have liked yourself usign the archive download files"
 authors = [{ name = "Lode Nachtergaele", email = "cast42@gmail.com" }]
 readme = "README.md"
 keywords = ['python']
