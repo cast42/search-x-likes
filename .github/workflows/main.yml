@@ -23,6 +23,8 @@ jobs:
         uses: ./.github/actions/setup-python-env
 
       - name: Run checks
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: make check
 
   tests-and-type-check:
@@ -44,9 +46,13 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Run tests
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: uv run python -m pytest tests --cov --cov-config=pyproject.toml --cov-report=xml
 
       - name: Check typing
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: uv run mypy
 
       - name: Upload coverage reports to Codecov with GitHub Action on Python 3.11
