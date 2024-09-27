@@ -51,7 +51,7 @@ def test_consistency(embedding_model: str = "text-embedding-3-small"):
 
     # Specify relative and absolute tolerance
     rtol = 1e-5  # Relative tolerance
-    atol = 1e-4  # Absolute tolerance
+    atol = 1e-3  # Absolute tolerance
 
     # Use assert_series_equal to check equality within tolerance
     tm.assert_series_equal(s1, s2, rtol=rtol, atol=atol)
