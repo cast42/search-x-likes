@@ -50,14 +50,14 @@ def main() -> None:
         like: LikeInfo = like_obj.get("like", {})
         tweet_id: str = like.get("tweetId", "N/A")
         full_text: str = like.get("fullText", "")
-        favorited_at: str = like.get("favoritedAt", "N/A")
+
         expanded_url: str = like.get("expandedUrl", "N/A")
 
         print("Tweet ID:", tweet_id)
-        print("Favorited At:", favorited_at)
         print("Text:", full_text)
         print("URL:", expanded_url)
         print("-" * 40)
+    print("-" * 40)
 
 
 if __name__ == "__main__":

@@ -10,6 +10,7 @@ dependencies = [
     "openai>=1.48.0",
     "pandas-stubs>=2.2.2.240807",
     "pandas>=2.2.3",
+    "textual>=0.81.0",
 ]
 
 [project.urls]
