@@ -18,22 +18,6 @@ class LikeInfo(TypedDict, total=False):
     expandedUrl: str
 
 
-# import bm25s
-
-# Sample corpus
-CORPUS = [
-    "A cat is a small domesticated carnivorous mammal.",
-    "Dogs are domesticated mammals, not natural wild animals.",
-    "A bird is a feathered, winged, bipedal, warm-blooded, egg-laying, vertebrate animal.",
-    "A fish is a cold-blooded animal that lives in water.",
-    "Elephants are the largest existing land animals.",
-]
-
-# Create a BM25 retriever
-# retriever = bm25s.BM25(corpus=CORPUS)
-# retriever.index(bm25s.tokenize(CORPUS))
-
-
 def highlight_query(text: str, query: str) -> str:
     """Wraps every occurrence of the query string in bold Markdown in the text."""
     # Escape special regex characters in the query to avoid issues
