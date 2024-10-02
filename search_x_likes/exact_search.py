@@ -9,6 +9,7 @@ from textual.widgets import Input, Label
 from search_x_likes.list_likes_in_archive import load_likes
 
 DATA_DIRECTORY: str = "/Users/lode/Downloads/data"  # Adjust this path if your data directory is elsewhere
+MAX_NUMBER_OF_MATCHES_SHOWN: int = 5
 
 
 class LikeInfo(TypedDict, total=False):
@@ -45,7 +46,7 @@ class InputApp(App):
     def compose(self) -> ComposeResult:
         """Set up the layout."""
         # Create the Input and TextArea widgets within a Vertical container
-        yield Label("Enter search term.")
+        yield Label(f"Search in {len(likes)} post you liked on X.")
         yield Input(
             placeholder="Enter search term...",
         )
@@ -56,10 +57,10 @@ class InputApp(App):
     @on(Input.Changed)
     def on_input_changed(self, event: Input.Changed) -> None:
         """Handle input change events."""
-        query = event.value.strip()
-        results_widget = self.query_one(tw.Markdown)
-        search = []
-        number_of_matches = 0
+        query: str = event.value.strip()
+        results_widget: tw.Markdown = self.query_one(tw.Markdown)
+        search: list[str] = []
+        number_of_matches: int = 0
         for like_obj in likes:
             like: LikeInfo = like_obj.get("like", {})
             full_text: str = like.get("fullText", "")
@@ -68,7 +69,7 @@ class InputApp(App):
             if query in highlight_text:
                 search.append(f"❱ [{expanded_url}](expanded_url): " + highlight_text)
                 number_of_matches += 1
-                if number_of_matches > 5:
+                if number_of_matches > MAX_NUMBER_OF_MATCHES_SHOWN:
                     break
 
         results_widget.update("\n\n".join(search))
