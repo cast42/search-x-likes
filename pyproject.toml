@@ -7,9 +7,11 @@ readme = "README.md"
 keywords = ['python']
 requires-python = ">=3.9,<4.0"
 dependencies = [
+    "bm25s>=0.2.1",
     "openai>=1.48.0",
     "pandas-stubs>=2.2.2.240807",
     "pandas>=2.2.3",
+    "pystemmer>=2.2.0.1",
     "textual>=0.81.0",
 ]
 
@@ -45,6 +47,7 @@ check_untyped_defs = "True"
 warn_return_any = "True"
 warn_unused_ignores = "True"
 show_error_codes = "True"
+ignore_missing_imports = "True"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

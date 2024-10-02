@@ -1,6 +1,7 @@
-import re
 from typing import TypedDict
 
+import bm25s
+import Stemmer  # optional: for stemming
 import textual.widgets as tw
 from textual import on
 from textual.app import App, ComposeResult
@@ -17,17 +18,6 @@ class LikeInfo(TypedDict, total=False):
     fullText: str
     favoritedAt: str
     expandedUrl: str
-
-
-def highlight_query(text: str, query: str) -> str:
-    """Wraps every occurrence of the query string in bold Markdown in the text."""
-    # Escape special regex characters in the query to avoid issues
-    query_escaped = re.escape(query)
-
-    # Use re.sub to replace all occurrences of the query with bold Markdown
-    highlighted_text = re.sub(f"({query_escaped})", r"**\1**", text, flags=re.IGNORECASE)
-
-    return highlighted_text
 
 
 class InputApp(App):
@@ -57,26 +47,33 @@ class InputApp(App):
     @on(Input.Changed)
     def on_input_changed(self, event: Input.Changed) -> None:
         """Handle input change events."""
-        query: str = event.value.strip()
+        query: str = event.value
+        if len(query) < 4:
+            return
+        query = query.strip()
+        query_tokens = bm25s.tokenize(query, stemmer=stemmer)
         results_widget: tw.Markdown = self.query_one(tw.Markdown)
-        search: list[str] = []
-        number_of_matches: int = 0
-        for like_obj in likes:
-            like: LikeInfo = like_obj.get("like", {})
-            full_text: str = like.get("fullText", "")
-            highlight_text: str = highlight_query(full_text, query)
-            expanded_url: str = like.get("expandedUrl", "N/A")
-            if query in highlight_text:
-                search.append(f"❱ [{expanded_url}](expanded_url): " + highlight_text)
-                number_of_matches += 1
-                if number_of_matches > MAX_NUMBER_OF_MATCHES_SHOWN:
-                    break
+        if len(query_tokens) < 1:  # Do not retrieve when there are no tokens (e.g. word is a stopword)
+            results_widget.update("")
+            return
 
-        results_widget.update("\n\n".join(search))
+        # Get top-k results as a tuple of (doc ids, scores). Both are arrays of shape (n_queries, k)
+        results, scores = retriever.retrieve(query_tokens, corpus=corpus, k=MAX_NUMBER_OF_MATCHES_SHOWN)
+
+        # Retrieve the found documents and update the markdown
+        docs = [f"❱ {results[0, i]}" for i in range(results.shape[1])]
+
+        results_widget.update("\n\n".join(docs))
 
 
 app = InputApp()
 
 if __name__ == "__main__":
+    stemmer = Stemmer.Stemmer("english")
     likes: list[dict[str, LikeInfo]] = load_likes(DATA_DIRECTORY)
+    corpus = [like_obj.get("like", {}).get("fullText", "") for like_obj in likes]
+    corpus_tokens = bm25s.tokenize(corpus, stopwords="en", stemmer=stemmer)
+    # Create the BM25 model and index the corpus
+    retriever = bm25s.BM25()
+    retriever.index(corpus_tokens)
     app.run()
