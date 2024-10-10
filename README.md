@@ -10,6 +10,7 @@ Search posts from x that have liked yourself usign the archive download files
 
 - **Github repository**: <https://github.com/cast42/search-x-likes/>
 - **Documentation** <https://cast42.github.io/search-x-likes/>
+- **Pypy package** <https://pypi.org/project/search-x-likes/>
 
 ## Getting started with your project
 
