@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from typing import TypedDict
 
-DATA_DIRECTORY: str = "/Users/lode/Downloads/data"  # Adjust this path if your data directory is elsewhere
+DATA_DIRECTORY: str = "/Users/lode/Downloads/twitter-2024-12-08-eb1fb01b92714ee7eb490e9622cb2b943d91a461b71f0cfa3e28f69b45424dfe/data"  # Adjust this path if your data directory is elsewhere
 
 
 class LikeInfo(TypedDict, total=False):
@@ -46,6 +46,7 @@ def load_likes(data_directory: str) -> list[dict[str, LikeInfo]]:
 
 def main() -> None:
     likes = load_likes(DATA_DIRECTORY)
+    print(f"{len(likes)} found.")
     for like_obj in likes:
         like: LikeInfo = like_obj.get("like", {})
         tweet_id: str = like.get("tweetId", "N/A")

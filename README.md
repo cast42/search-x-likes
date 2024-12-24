@@ -6,7 +6,7 @@
 [![Commit activity](https://img.shields.io/github/commit-activity/m/cast42/search-x-likes)](https://img.shields.io/github/commit-activity/m/cast42/search-x-likes)
 [![License](https://img.shields.io/github/license/cast42/search-x-likes)](https://img.shields.io/github/license/cast42/search-x-likes)
 
-Search posts from x that have liked yourself usign the archive download files
+Search posts from x that have liked yourself using the archive download files
 
 - **Github repository**: <https://github.com/cast42/search-x-likes/>
 - **Documentation** <https://cast42.github.io/search-x-likes/>
@@ -69,6 +69,20 @@ To enable the code coverage reports, see [here](https://fpgmaas.github.io/cookie
 - Create a new tag in the form `*.*.*`.
 
 For more details, see [here](https://fpgmaas.github.io/cookiecutter-uv/features/cicd/#how-to-trigger-a-release).
+
+## Development
+
+Use `ruff` for linting and formatting, `mypy` for static code analysis, and `pytest` for testing.
+
+The documentation is built with `mkdocs`, `mkdocs-material` and `mkdocstrings`.
+
+## Contributing
+
+All contributions are welcome, including more documentation, examples, code, and tests. Even questions.
+
+## License - MIT
+
+The package is open-sourced under the conditions of the [MIT license](https://choosealicense.com/licenses/mit/).
 
 ---
 
