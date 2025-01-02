@@ -38,6 +38,9 @@ dev-dependencies = [
 requires = ["setuptools >= 61.0"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools]
+packages = ["search_x_likes"]
+
 [tool.mypy]
 files = ["search_x_likes"]
 disallow_untyped_defs = "True"
