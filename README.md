@@ -54,6 +54,12 @@ git commit -m 'Fix formatting issues'
 git push origin main
 ```
 
+### 5. Set OPENAI_API_KEY key
+
+```bash
+export OPENAI_API_KEY=<your key>
+```
+
 You are now ready to start development on your project!
 The CI/CD pipeline will be triggered when you open a pull request, merge to main, or when you create a new release.
 
