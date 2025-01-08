@@ -13,6 +13,7 @@ dependencies = [
     "pandas>=2.2.3",
     "pystemmer>=2.2.0.1",
     "textual>=0.81.0",
+    "fastparquet>=2024.11.0",
 ]
 
 [project.urls]
