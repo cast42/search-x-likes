@@ -14,7 +14,7 @@ PARQUET_PATH: str = "./data/liked_posts_embedded.parquet"  # name and location o
 
 
 class EmbeddingColumnTypeError(TypeError):
-    def __init__(self, column_name):
+    def __init__(self, column_name: str):
         super().__init__(f"Column '{column_name}' must contain numpy arrays.")
 
 
@@ -36,11 +36,14 @@ def get_top_k_embeddings(df: pd.DataFrame, embeddings_col: str, search_embedding
     if not isinstance(df[embeddings_col].iloc[0], np.ndarray):
         raise EmbeddingColumnTypeError(embeddings_col)
 
+    # Convert the Series to a list of NumPy arrays
+    embeddings_list = df[embeddings_col].to_list()
+
+    # Stack embeddings into a single array
+    embeddings = np.stack([np.array(embedding) for embedding in embeddings_list])
+
     # Compute cosine similarities
-    similarities = cosine_similarity(
-        np.stack(df[embeddings_col].values),  # Stack all embeddings into a 2D array
-        search_embedding.reshape(1, -1),  # Reshape search embedding for compatibility
-    ).flatten()
+    similarities = cosine_similarity(embeddings, search_embedding.reshape(1, -1)).flatten()
 
     # Add similarities as a new column
     df["similarity"] = similarities

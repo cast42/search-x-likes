@@ -1,7 +1,6 @@
 import os  # for environment variables
 from typing import TypedDict
 
-import numpy as np
 import openai  # for generating embeddings
 import pandas as pd
 from rich.progress import Progress
@@ -47,15 +46,6 @@ def get_embedding(client: openai.OpenAI, text: str, model: str = "text-embedding
     return embedding
 
 
-def embed_strings_in_batches(strings, batch_size):
-    embeddings = []
-    for i in range(0, len(strings), batch_size):
-        batch = strings[i : i + batch_size]
-        response = openai.embedding.create(input=batch, model=EMBEDDING_MODEL)
-        embeddings.extend([item["embedding"] for item in response["data"]])
-    return embeddings
-
-
 def main() -> None:
     api_key: str = os.environ.get("OPENAI_API_KEY", "<your OpenAI API key if not set as env var>")
     client: openai.OpenAI = openai.OpenAI(api_key=api_key)
@@ -75,7 +65,7 @@ def main() -> None:
         full_texts.append(full_text)
         expanded_urls.append(expanded_url)
 
-    embeddings: list[np.array] = []
+    embeddings: list[list[float]] = []
     batch_size: int = 100
     with Progress() as progress:
         task = progress.add_task("[green]Generating embeddings...", total=len(full_texts))
@@ -83,7 +73,8 @@ def main() -> None:
             batch = full_texts[i : i + batch_size]
             response = client.embeddings.create(input=batch, model=EMBEDDING_MODEL)
             response_dict = response.to_dict() if hasattr(response, "to_dict") else response
-            embeddings.extend([item["embedding"] for item in response_dict["data"]])
+            if isinstance(response_dict, dict) and "data" in response_dict:
+                embeddings.extend([item["embedding"] for item in response_dict["data"]])
             progress.update(task, advance=batch_size)
 
     data = {
