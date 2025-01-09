@@ -5,7 +5,7 @@ site_description: Search posts from x that have liked yourself usign the archive
 site_author: Lode Nachtergaele
 edit_uri: edit/main/docs/
 repo_name: cast42/search-x-likes
-copyright: Maintained by <a href="https://cast42.com">Florian</a>.
+copyright: Maintained by <a href="https://cast42.com">cast42</a>.
 
 nav:
   - Home: index.md
