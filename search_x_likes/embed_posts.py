@@ -39,7 +39,7 @@ def get_embedding(client: openai.OpenAI, text: str, model: str = "text-embedding
         embedding: list[float] = response.data[0].embedding
     except Exception as e:
         print(f"An error occurred while generating the embedding: {e}")
-        embedding = []
+        raise
     finally:
         if "embedding" not in locals():
             embedding = []
