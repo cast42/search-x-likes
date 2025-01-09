@@ -75,9 +75,11 @@ class InputApp(App):
         yield tw.Markdown(markdown="Search results will be displayed here...")
 
     # Explicitly handle the changed event for the input widget
-    @on(Input.Changed)
-    def on_input_changed(self, event: Input.Changed) -> None:
-        """Handle input change events."""
+    # @on(Input.Changed)
+    # def on_input_changed(self, event: Input.Changed) -> None:
+    @on(Input.Submitted)
+    def on_input_submitted(self, event: Input.Submitted) -> None:
+        """Handle input submission events (when Enter is pressed)."""
         query: str = event.value
         if len(query) < 4:
             return
@@ -88,7 +90,7 @@ class InputApp(App):
         results_widget: tw.Markdown = self.query_one(tw.Markdown)
 
         # Get top-k results as a tuple of (doc ids, scores). Both are arrays of shape (n_queries, k)
-        results = get_top_k_embeddings(df, "embedding", np.array(search_embedding), k=3)
+        results = get_top_k_embeddings(df, "embeddings", np.array(search_embedding), k=5)
 
         # Retrieve the found documents and update the markdown
         docs = [f"❱ {result}" for result in results["full_text"].values]
@@ -102,5 +104,5 @@ if __name__ == "__main__":
     api_key: str = os.environ.get("OPENAI_API_KEY", "<your OpenAI API key if not set as env var>")
     client: openai.OpenAI = openai.OpenAI(api_key=api_key)
     df = pd.read_parquet(PARQUET_PATH)
-    df["embedding"] = df["embedding"].map(lambda x: np.array(x))
+    df["embeddings"] = df["embeddings"].map(lambda x: np.array(x))
     app.run()
