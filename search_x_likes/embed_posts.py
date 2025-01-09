@@ -47,34 +47,54 @@ def get_embedding(client: openai.OpenAI, text: str, model: str = "text-embedding
     return embedding
 
 
+def embed_strings_in_batches(strings, batch_size):
+    embeddings = []
+    for i in range(0, len(strings), batch_size):
+        batch = strings[i : i + batch_size]
+        response = openai.embedding.create(input=batch, model=EMBEDDING_MODEL)
+        embeddings.extend([item["embedding"] for item in response["data"]])
+    return embeddings
+
+
 def main() -> None:
     api_key: str = os.environ.get("OPENAI_API_KEY", "<your OpenAI API key if not set as env var>")
     client: openai.OpenAI = openai.OpenAI(api_key=api_key)
     likes = load_likes(DATA_DIRECTORY)
 
-    embedded_posts = []
+    tweet_ids: list[str] = []
+    full_texts: list[str] = []
+    expanded_urls: list[str] = []
+    for like_obj in likes:
+        like: LikeInfo = like_obj.get("like", {})
+        tweet_id: str = like.get("tweetId", "N/A")
+        full_text: str = like.get("fullText", "")
+        expanded_url: str = like.get("expandedUrl", "N/A")
+        if len(full_text) < 5:
+            continue
+        tweet_ids.append(tweet_id)
+        full_texts.append(full_text)
+        expanded_urls.append(expanded_url)
+
+    embeddings: list[np.array] = []
+    batch_size: int = 100
     with Progress() as progress:
-        task = progress.add_task("[green]Generating embeddings...", total=len(likes))
-        for like_obj in likes:
-            like: LikeInfo = like_obj.get("like", {})
-            tweet_id: str = like.get("tweetId", "N/A")
-            full_text: str = like.get("fullText", "")
-            expanded_url: str = like.get("expandedUrl", "N/A")
-            if len(full_text) < 4:
-                progress.update(task, advance=1)
-                continue
+        task = progress.add_task("[green]Generating embeddings...", total=len(full_texts))
+        for i in range(0, len(full_texts), batch_size):
+            batch = full_texts[i : i + batch_size]
+            response = client.embeddings.create(input=batch, model=EMBEDDING_MODEL)
+            response_dict = response.to_dict() if hasattr(response, "to_dict") else response
+            embeddings.extend([item["embedding"] for item in response_dict["data"]])
+            progress.update(task, advance=batch_size)
 
-            embedding = get_embedding(client, full_text, EMBEDDING_MODEL)
+    data = {
+        "tweet_id": tweet_ids,
+        "full_text": full_texts,
+        "expanded_url": expanded_urls,
+        "embeddings": embeddings,
+    }
 
-            # print("Tweet ID:", tweet_id)
-            # print("Text:", full_text)
-            # print("URL:", expanded_url)
-            # print("-" * 40)
-            if len(embedding) > 0:
-                embedded_posts.append([tweet_id, full_text, expanded_url, np.array(embedding)])
-            progress.update(task, advance=1)
-
-    df = pd.DataFrame(embedded_posts, columns=["tweet_id", "full_text", "expanded_url", "embeddings"])
+    # Create the DataFrame
+    df = pd.DataFrame(data)
 
     df.to_parquet(SAVE_PATH, index=False)
 
