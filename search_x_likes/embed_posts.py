@@ -1,8 +1,10 @@
 import os  # for environment variables
 from typing import TypedDict
 
+import numpy as np
 import openai  # for generating embeddings
 import pandas as pd
+from rich.progress import Progress
 
 from search_x_likes.list_likes_in_archive import load_likes
 
@@ -51,21 +53,28 @@ def main() -> None:
     likes = load_likes(DATA_DIRECTORY)
 
     embedded_posts = []
-    for like_obj in likes:
-        like: LikeInfo = like_obj.get("like", {})
-        tweet_id: str = like.get("tweetId", "N/A")
-        full_text: str = like.get("fullText", "")
-        expanded_url: str = like.get("expandedUrl", "N/A")
-        embedding = get_embedding(client, full_text, EMBEDDING_MODEL)
+    with Progress() as progress:
+        task = progress.add_task("[green]Generating embeddings...", total=len(likes))
+        for like_obj in likes:
+            like: LikeInfo = like_obj.get("like", {})
+            tweet_id: str = like.get("tweetId", "N/A")
+            full_text: str = like.get("fullText", "")
+            expanded_url: str = like.get("expandedUrl", "N/A")
+            if len(full_text) < 4:
+                progress.update(task, advance=1)
+                continue
 
-        print("Tweet ID:", tweet_id)
-        print("Text:", full_text)
-        print("URL:", expanded_url)
-        print("-" * 40)
-        if len(embedding) > 0:
-            embedded_posts.append([tweet_id, full_text, expanded_url, embedding])
+            embedding = get_embedding(client, full_text, EMBEDDING_MODEL)
 
-    df = pd.DataFrame(embedded_posts, columns=["tweet_id", "full_text", "expanded_url", "embedding"])
+            # print("Tweet ID:", tweet_id)
+            # print("Text:", full_text)
+            # print("URL:", expanded_url)
+            # print("-" * 40)
+            if len(embedding) > 0:
+                embedded_posts.append([tweet_id, full_text, expanded_url, np.array(embedding)])
+            progress.update(task, advance=1)
+
+    df = pd.DataFrame(embedded_posts, columns=["tweet_id", "full_text", "expanded_url", "embeddings"])
 
     df.to_parquet(SAVE_PATH, index=False)
 
