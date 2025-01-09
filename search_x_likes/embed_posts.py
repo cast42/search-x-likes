@@ -9,7 +9,7 @@ from search_x_likes.list_likes_in_archive import load_likes
 # DATA_DIRECTORY: str = "/Users/lode/Downloads/data"  # Adjust this path if your data directory is elsewhere
 DATA_DIRECTORY: str = "/Users/lode/Downloads/twitter-2024-12-08-eb1fb01b92714ee7eb490e9622cb2b943d91a461b71f0cfa3e28f69b45424dfe/data"  # Adjust this path if your data directory is elsewhere
 EMBEDDING_MODEL: str = "text-embedding-3-small"
-SAVE_PATH: str = "./liked_posts_embedded.parquet"  # name and location of the generated parquet file
+SAVE_PATH: str = "./data/liked_posts_embedded.parquet"  # name and location of the generated parquet file
 
 
 class LikeInfo(TypedDict, total=False):
@@ -32,9 +32,16 @@ def get_embedding(client: openai.OpenAI, text: str, model: str = "text-embedding
         list[float]: A list of float representing an embedding vector.
     """
     cleaned_text = text.replace("\n", " ")
-    response = client.embeddings.create(input=[cleaned_text], model=model)
-    # Extract the embedding vector from the response
-    embedding: list[float] = response.data[0].embedding
+    try:
+        response = client.embeddings.create(input=[cleaned_text], model=model)
+        # Extract the embedding vector from the response
+        embedding: list[float] = response.data[0].embedding
+    except Exception as e:
+        print(f"An error occurred while generating the embedding: {e}")
+        embedding = []
+    finally:
+        if "embedding" not in locals():
+            embedding = []
     return embedding
 
 
@@ -44,7 +51,7 @@ def main() -> None:
     likes = load_likes(DATA_DIRECTORY)
 
     embedded_posts = []
-    for like_obj in likes[:10]:
+    for like_obj in likes:
         like: LikeInfo = like_obj.get("like", {})
         tweet_id: str = like.get("tweetId", "N/A")
         full_text: str = like.get("fullText", "")
@@ -55,7 +62,8 @@ def main() -> None:
         print("Text:", full_text)
         print("URL:", expanded_url)
         print("-" * 40)
-        embedded_posts.append([tweet_id, full_text, expanded_url, embedding])
+        if len(embedding) > 0:
+            embedded_posts.append([tweet_id, full_text, expanded_url, embedding])
 
     df = pd.DataFrame(embedded_posts, columns=["tweet_id", "full_text", "expanded_url", "embedding"])
 
