@@ -36,11 +36,7 @@ def get_top_k_embeddings(df: pd.DataFrame, embeddings_col: str, search_embedding
     if not isinstance(df[embeddings_col].iloc[0], np.ndarray):
         raise EmbeddingColumnTypeError(embeddings_col)
 
-    # Convert the Series to a list of NumPy arrays
-    embeddings_list = df[embeddings_col].to_list()
-
-    # Stack embeddings into a single array
-    embeddings = np.stack([np.array(embedding) for embedding in embeddings_list])
+    embeddings = np.vstack(df[embeddings_col].to_list())
 
     # Compute cosine similarities
     similarities = cosine_similarity(embeddings, search_embedding.reshape(1, -1)).flatten()
