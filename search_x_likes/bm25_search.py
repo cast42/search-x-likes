@@ -9,7 +9,7 @@ from textual.widgets import Input, Label
 
 from search_x_likes.list_likes_in_archive import load_likes
 
-DATA_DIRECTORY: str = "/Users/lode/Downloads/twitter-2024-12-08-eb1fb01b92714ee7eb490e9622cb2b943d91a461b71f0cfa3e28f69b45424dfe/data"  # Adjust this path if your data directory is elsewhere
+DATA_DIRECTORY: str = "data"  # Adjust this path if your data directory is elsewhere
 MAX_NUMBER_OF_MATCHES_SHOWN: int = 5
 
 

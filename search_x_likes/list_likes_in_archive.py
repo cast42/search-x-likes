@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from typing import TypedDict
 
-DATA_DIRECTORY: str = "/Users/lode/Downloads/twitter-2024-12-08-eb1fb01b92714ee7eb490e9622cb2b943d91a461b71f0cfa3e28f69b45424dfe/data"  # Adjust this path if your data directory is elsewhere
+DATA_DIRECTORY: str = "/data"  # Adjust this path if your data directory is elsewhere
 
 
 class LikeInfo(TypedDict, total=False):

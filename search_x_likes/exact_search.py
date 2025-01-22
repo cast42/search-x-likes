@@ -8,7 +8,7 @@ from textual.widgets import Input, Label
 
 from search_x_likes.list_likes_in_archive import load_likes
 
-DATA_DIRECTORY: str = "/Users/lode/Downloads/data"  # Adjust this path if your data directory is elsewhere
+DATA_DIRECTORY: str = "data"  # Adjust this path if your data directory is elsewhere
 MAX_NUMBER_OF_MATCHES_SHOWN: int = 5
 
 
