@@ -1,3 +1,6 @@
+# TUI application the performs exact matching search of a query
+# on the full_text strings in DATA_DIRECTORY/likes.js
+
 import re
 from typing import TypedDict
 

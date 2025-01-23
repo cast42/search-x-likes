@@ -1,3 +1,5 @@
+# Utiltiy function the generate a list of strings from DATA_DIRECTORY/likes.js
+
 import json
 from pathlib import Path
 from typing import TypedDict

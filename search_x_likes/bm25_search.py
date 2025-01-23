@@ -1,3 +1,9 @@
+# TUI application to use bm25 search in a list of strings
+#
+# unzip the X archive in map DATA_DIRECTORY , this pogram looks for likes.js in that folder
+#
+# Run with: uv run python search_x_likes/bm25_search.py
+
 from typing import TypedDict
 
 import bm25s

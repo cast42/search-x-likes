@@ -1,16 +1,24 @@
+# TUI application the calculates the cosine distance between the query and the texts of the posts in a parquet file.
+# The location of the parquet file defined in constant PARQUET_PATH
+# The parquetfile is created in the script embed_posts.py
+# run with: uv run python search_x_likes/cosine_search.py
+# Enter your search term in the TUI and hit enter
+
 import os
 
 import numpy as np
 import openai
 import pandas as pd
+import pyarrow.parquet as pq
 import textual.widgets as tw
+from datasets import load_dataset
 from sklearn.metrics.pairwise import cosine_similarity
 from textual import on
 from textual.app import App, ComposeResult
 from textual.widgets import Input, Label
 
 EMBEDDING_MODEL: str = "text-embedding-3-small"
-PARQUET_PATH: str = "./data/liked_posts_embedded.parquet"  # name and location of the generated parquet file
+PARQUET_PATH: str = "./data/embeddings.parquet"  # name and location of the generated parquet file
 
 
 class EmbeddingColumnTypeError(TypeError):
@@ -33,8 +41,9 @@ def get_top_k_embeddings(df: pd.DataFrame, embeddings_col: str, search_embedding
         raise EmbeddingColumnTypeError(embeddings_col)
     """
     # Ensure the column contains numpy arrays
-    if not isinstance(df[embeddings_col].iloc[0], np.ndarray):
-        raise EmbeddingColumnTypeError(embeddings_col)
+    # if not isinstance(df[embeddings_col].iloc[0], np.ndarray):
+    #     print(df[embeddings_col].iloc[0])
+    #     raise EmbeddingColumnTypeError(embeddings_col)
 
     embeddings = np.vstack(df[embeddings_col].to_list())
 
@@ -51,6 +60,7 @@ def get_top_k_embeddings(df: pd.DataFrame, embeddings_col: str, search_embedding
 
 
 class InputApp(App):
+    global df
     CSS = """
     Input {
         margin: 1 1;
@@ -102,6 +112,26 @@ app = InputApp()
 if __name__ == "__main__":
     api_key: str = os.environ.get("OPENAI_API_KEY", "<your OpenAI API key if not set as env var>")
     client: openai.OpenAI = openai.OpenAI(api_key=api_key)
-    df = pd.read_parquet(PARQUET_PATH)
-    df["embeddings"] = df["embeddings"].map(lambda x: np.array(x))
+    try:
+        # Try to load the local parquet file
+        # df = pd.read_parquet(PARQUET_PATH)
+        # df["embeddings"] = df["embeddings"].map(lambda x: np.array(x))
+        # df["embeddings"] = df["embeddings"].map(lambda x: np.array(ast.literal_eval(x)))
+        table = pq.read_table(PARQUET_PATH)
+        # Convert to Pandas DataFrame
+        df = table.to_pandas()
+    except FileNotFoundError as e:
+        print(f"Error: Local file '{PARQUET_PATH}' not found. Attempting to load from Hugging Face dataset. {e}")
+        try:
+            # Fallback to loading the Hugging Face dataset
+            dataset = load_dataset("cast42/x_likes", split="train")
+            # Convert to Pandas DataFrame
+            df = dataset.to_pandas()
+        except Exception as hf_e:
+            print(f"Failed to load from Hugging Face dataset: {hf_e}")
+            raise  # Reraise the exception after logging
+    except Exception as e:
+        print(f"An unexpected error occurred while reading the local parquet file: {e}")
+        raise  # Reraise the exception after logging
+
     app.run()

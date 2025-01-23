@@ -1,16 +1,22 @@
+# Python script the embeds the full_text string in likes.js in DATA_DIRECTORY
+# The embedding is via OPENAI
+# Provide api key via: export OPENAI_API_KEY=<your key>
+
 import os  # for environment variables
 from typing import TypedDict
 
 import openai  # for generating embeddings
 import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
 from rich.progress import Progress
 
 from search_x_likes.list_likes_in_archive import load_likes
 
 # DATA_DIRECTORY: str = "/Users/lode/Downloads/data"  # Adjust this path if your data directory is elsewhere
-DATA_DIRECTORY: str = "/Users/lode/Downloads/twitter-2024-12-08-eb1fb01b92714ee7eb490e9622cb2b943d91a461b71f0cfa3e28f69b45424dfe/data"  # Adjust this path if your data directory is elsewhere
+DATA_DIRECTORY: str = "data"  # Adjust this path if your data directory is elsewhere
 EMBEDDING_MODEL: str = "text-embedding-3-small"
-SAVE_PATH: str = "./data/liked_posts_embedded.parquet"  # name and location of the generated parquet file
+SAVE_PATH: str = "./data/embeddings.parquet"  # name and location of the generated parquet file
 
 
 class LikeInfo(TypedDict, total=False):
@@ -87,7 +93,17 @@ def main() -> None:
     # Create the DataFrame
     df = pd.DataFrame(data)
 
-    df.to_parquet(SAVE_PATH, index=False)
+    #  Schema where `embeddings` is a list of float32
+    schema = pa.schema([
+        pa.field("tweet_id", pa.string()),
+        pa.field("full_text", pa.string()),
+        pa.field("expanded_url", pa.string()),
+        pa.field("embeddings", pa.list_(pa.float32())),
+    ])
+
+    # Convert the entire DataFrame to a PyArrow Table
+    table = pa.Table.from_pandas(df, schema=schema)
+    pq.write_table(table, SAVE_PATH)
 
 
 if __name__ == "__main__":
