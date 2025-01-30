@@ -9,7 +9,6 @@
 
 import os
 
-import pandas as pd
 import pyarrow.parquet as pq
 from datasets import Dataset
 from dotenv import load_dotenv
@@ -22,9 +21,14 @@ USER_NAME = "cast42"  # Replace with your Hugging Face username
 REPO_NAME = "x_likes"  # Change to your dataset name
 
 
+class MissingTokenError(Exception):
+    def __init__(self) -> None:
+        super().__init__("HF_TOKEN is not found in the .env file.")
+
+
 def main() -> None:
-    df = pd.read_parquet(PARQUET_FILE)
-    print(df.columns)
+    # df = pd.read_parquet(PARQUET_FILE)
+    # print(df.columns)
 
     table = pq.read_table(PARQUET_FILE)
     ds = Dataset(table)
@@ -33,7 +37,7 @@ def main() -> None:
     hf_token = os.getenv("HF_TOKEN")
 
     if not hf_token:
-        raise ValueError("HF_TOKEN is not found in the .env file.")
+        raise MissingTokenError()
 
     # Dataset path and repository details
     full_repo_name = f"{USER_NAME}/{REPO_NAME}"  # Format: username/repo_name

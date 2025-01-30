@@ -4,7 +4,11 @@
 # run with: uv run python search_x_likes/cosine_search.py
 # Enter your search term in the TUI and hit enter
 
+import contextlib
+import logging
 import os
+from collections.abc import Generator
+from time import perf_counter
 
 import numpy as np
 import openai
@@ -19,6 +23,21 @@ from textual.widgets import Input, Label
 
 EMBEDDING_MODEL: str = "text-embedding-3-small"
 PARQUET_PATH: str = "./data/embeddings.parquet"  # name and location of the generated parquet file
+
+"""
+Timer context manager, only used in debug.
+"""
+
+
+@contextlib.contextmanager
+def timer(subject: str = "time") -> Generator[None, None, None]:
+    """Print the elapsed time. (Only used in debugging)"""
+    start = perf_counter()
+    yield
+    elapsed = perf_counter() - start
+    elapsed_ms = elapsed * 1000
+    # log(f"{subject} elapsed {elapsed_ms:.4f}ms")
+    logging.info(f"{subject} elapsed {elapsed_ms:.4f}ms")
 
 
 class EmbeddingColumnTypeError(TypeError):
@@ -48,7 +67,8 @@ def get_top_k_embeddings(df: pd.DataFrame, embeddings_col: str, search_embedding
     embeddings = np.vstack(df[embeddings_col].to_list())
 
     # Compute cosine similarities
-    similarities = cosine_similarity(embeddings, search_embedding.reshape(1, -1)).flatten()
+    with timer("Cosine similarity"):
+        similarities = cosine_similarity(embeddings, search_embedding.reshape(1, -1)).flatten()
 
     # Add similarities as a new column
     df["similarity"] = similarities
@@ -93,13 +113,15 @@ class InputApp(App):
         if len(query) < 4:
             return
         query = query.strip()
-        response = client.embeddings.create(input=[query], model=EMBEDDING_MODEL)
+        with timer("Embed with openAI"):
+            response = client.embeddings.create(input=[query], model=EMBEDDING_MODEL)
         # Extract the embedding vector from the response
         search_embedding: list[float] = response.data[0].embedding
         results_widget: tw.Markdown = self.query_one(tw.Markdown)
 
         # Get top-k results as a tuple of (doc ids, scores). Both are arrays of shape (n_queries, k)
-        results = get_top_k_embeddings(df, "embeddings", np.array(search_embedding), k=5)
+        with timer("get_top_k_embeddings"):
+            results = get_top_k_embeddings(df, "embeddings", np.array(search_embedding), k=5)
 
         # Retrieve the found documents and update the markdown
         docs = [f"❱ {result}" for result in results["full_text"].values]
@@ -111,6 +133,13 @@ app = InputApp()
 
 if __name__ == "__main__":
     api_key: str = os.environ.get("OPENAI_API_KEY", "<your OpenAI API key if not set as env var>")
+    # Configure logging to file
+    logging.basicConfig(
+        filename="textual_debug.log",  # Log file name
+        filemode="w",  # Overwrite the file each time (use "a" to append)
+        level=logging.INFO,  # Logging level (DEBUG for detailed logs)
+        format="%(asctime)s - %(levelname)s - %(message)s",  # Log format
+    )
     client: openai.OpenAI = openai.OpenAI(api_key=api_key)
     try:
         # Try to load the local parquet file

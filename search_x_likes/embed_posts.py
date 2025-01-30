@@ -1,6 +1,6 @@
 # Python script the embeds the full_text string in likes.js in DATA_DIRECTORY
 # The embedding is via OPENAI
-# Provide api key via: export OPENAI_API_KEY=<your key>
+# Provide api key via:
 
 import os  # for environment variables
 from typing import TypedDict
@@ -13,7 +13,6 @@ from rich.progress import Progress
 
 from search_x_likes.list_likes_in_archive import load_likes
 
-# DATA_DIRECTORY: str = "/Users/lode/Downloads/data"  # Adjust this path if your data directory is elsewhere
 DATA_DIRECTORY: str = "data"  # Adjust this path if your data directory is elsewhere
 EMBEDDING_MODEL: str = "text-embedding-3-small"
 SAVE_PATH: str = "./data/embeddings.parquet"  # name and location of the generated parquet file
