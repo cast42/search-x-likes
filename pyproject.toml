@@ -17,6 +17,11 @@ dependencies = [
     "scikit-learn>=1.6.0",
     "python-dotenv>=1.0.1",
     "datasets>=3.2.0",
+    "torch>=2.6.0",
+    "torchvision>=0.21.0",
+    "transformers==4.48.0",
+    "model2vec>=0.3.8",
+    "sentence-transformers>=3.4.1",
 ]
 
 [project.urls]
