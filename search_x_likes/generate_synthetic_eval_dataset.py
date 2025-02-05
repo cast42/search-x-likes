@@ -136,19 +136,19 @@ def main() -> None:
     ) as progress:
         task = progress.add_task("", total=NUM2PROCESS)
 
-        for post, id in zip(liked_posts[:NUM2PROCESS], ids[:NUM2PROCESS]):
+        for post, post_id in zip(liked_posts[:NUM2PROCESS], ids[:NUM2PROCESS]):
             response_data = generate_search_queries(client, post)
 
             if response_data and response_data.queries:
                 full_texts.append(post)
                 queries.append(response_data.queries[0].query)
-                results_ids.append(id)
+                results_ids.append(post_id)
                 if len(response_data.queries) > 1:
                     full_texts.append(post)
                     queries.append(response_data.queries[1].query)
-                    results_ids.append(id)
+                    results_ids.append(post_id)
 
-            time.sleep(random.uniform(0.001, 0.01))  # Rate limit handling
+            time.sleep(random.uniform(0.001, 0.01))  # Rate limit handling  # noqa: S311
             progress.update(task, advance=1)
         progress.console.log(f"All {NUM2PROCESS} queries generated.")
 
