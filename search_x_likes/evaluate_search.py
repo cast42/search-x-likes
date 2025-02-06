@@ -50,10 +50,7 @@ ds = load_dataset("cast42/x_likes_queries")
 # embeddings_model, transformer_model = "intfloat/multilingual-e5-large", True
 # # https://bsky.app/profile/tomaarsen.com/post/3lgxsz227y22m
 embeddings_model, transformer_model = "minishlab/potion-retrieval-32M", False
-if transformer_model:
-    model = SentenceTransformer(embeddings_model)
-else:
-    model = StaticModel.from_pretrained(embeddings_model)
+model = SentenceTransformer(embeddings_model) if transformer_model else StaticModel.from_pretrained(embeddings_model)
 
 queries = ds["train"]["query"]
 documents = ds["train"]["full_text"]
