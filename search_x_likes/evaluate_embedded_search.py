@@ -79,8 +79,16 @@ ground_truth_indices = torch.arange(num_queries)
 ### Compute Metrics ###
 
 
-# 1. Mean Reciprocal Rank (MRR)
 def mean_reciprocal_rank(retrieved_indices: torch.Tensor, ground_truth_indices: torch.Tensor) -> float:
+    """Computes the Mean Reciprocal Rank (MRR) for a list of retrieved indices.
+
+    Args:
+        retrieved_indices (torch.Tensor): A tensor containing retrieved indices for each query.
+        ground_truth_indices (torch.Tensor): A tensor containing ground truth indices for each query.
+
+    Returns:
+        float: The mean reciprocal rank score.
+    """
     ranks: list[float] = []
     for i, retrieved in enumerate(retrieved_indices):
         gt: int | float = ground_truth_indices[i].item()  # Ground truth index
@@ -89,16 +97,35 @@ def mean_reciprocal_rank(retrieved_indices: torch.Tensor, ground_truth_indices: 
     return float(np.mean(ranks))
 
 
-# 2. Recall@k
 def recall_at_k(retrieved_indices: torch.Tensor, ground_truth_indices: torch.Tensor, k: int) -> float:
+    """Computes Recall@k, which measures the proportion of times the ground truth item
+    is among the top-k retrieved items.
+
+    Args:
+        retrieved_indices (torch.Tensor): A tensor containing retrieved indices for each query.
+        ground_truth_indices (torch.Tensor): A tensor containing ground truth indices for each query.
+        k (int): The cutoff rank for computing recall.
+
+    Returns:
+        float: The recall@k score.
+    """
     recall: list[int] = []
     for i, retrieved in enumerate(retrieved_indices):
         recall.append(1 if ground_truth_indices[i].item() in retrieved[:k] else 0)
     return float(np.mean(recall))
 
 
-# 3. NDCG@k
 def ndcg_at_k(retrieved_indices: torch.Tensor, ground_truth_indices: torch.Tensor, k: int) -> float:
+    """Computes the Normalized Discounted Cumulative Gain (NDCG) at rank k.
+
+    Args:
+        retrieved_indices (torch.Tensor): A tensor containing retrieved indices for each query.
+        ground_truth_indices (torch.Tensor): A tensor containing ground truth indices for each query.
+        k (int): The cutoff rank for computing NDCG.
+
+    Returns:
+        float: The NDCG@k score.
+    """
     scores: list[float] = []
     for i, retrieved in enumerate(retrieved_indices):
         relevance: list[int] = [1 if retrieved[j] == ground_truth_indices[i] else 0 for j in range(k)]

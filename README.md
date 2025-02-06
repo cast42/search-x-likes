@@ -82,6 +82,69 @@ Use `ruff` for linting and formatting, `mypy` for static code analysis, and `pyt
 
 The documentation is built with `mkdocs`, `mkdocs-material` and `mkdocstrings`.
 
+## Search approaches
+
+### Exact search
+
+Retrieve the first k exact matches. This approach is implemented as a textual TUI in [search_x_likes/exact_search.py](search_x_likes/exact_search.py)
+
+```python
+k = 5 # retrieve k documents
+retrieved = []
+for idx, document in enumerate(documents):
+    if query in document:
+        retrieved.append(document)
+    if idx > k:
+        break
+```
+
+### BM25S
+
+BM25S, an efficient Python-based
+implementation of BM25 that only depends on
+Numpy and Scipy. BM25S achieves up to a
+500x speedup compared to the most popular
+Python-based framework by eagerly computing BM25 scores during indexing and storing
+them into sparse matrices.
+
+This approach is implemented in [search_x_likes/bm25_search.py](search_x_likes/bm25_search.py)
+
+[![Hugging Face Blog](https://img.shields.io/badge/Hugging%20Face-Blog-ffbe2f?logo=huggingface)](https://huggingface.co/blog/xhluca/bm25s) BM25 for Python: Achieving high performance while simplifying dependencies with BM25S⚡
+
+[![arXiv](https://img.shields.io/badge/arXiv-2407.03618-b31b1b.svg)](https://arxiv.org/abs/2407.03618) Xing Han Lù, BM25S: Orders of magnitude faster lexical search via eager sparse scoring
+
+[![GitHub](https://img.shields.io/badge/GitHub-xhluca%2Fbm25s-181717?logo=github)](https://github.com/xhluca/bm25s)
+
+### Retrieve top-k documents scored with cosine similarity of their embeddings
+
+Given the embedding of a document A and an embedding of a query B, score it's similarity as the normalized dot product
+of the two vectors:
+
+$$
+\text{cosine similarity} = \frac{\mathbf{A} \cdot \mathbf{B}}{\|\mathbf{A}\| \|\mathbf{B}\|}
+$$
+
+This approach is implemented in [search_x_likes/cosine_search.py](search_x_likes/cosine_search.py)
+
+### To evaluate the different retrieval methods, a synthetic dataset is created with llm
+
+The code to generate the synthetic dataset with gpt-4o-mini is in [search_x_likes/generate_synthetic_eval_dataset.py](search_x_likes/generate_synthetic_eval_dataset.py)
+It uses input the dataset that contains the post on x that are liked:
+[![Hugging Face Dataset](https://img.shields.io/badge/Hugging%20Face-Dataset-ffbe2f?logo=huggingface)](https://huggingface.co/datasets/cast42/x_likes)
+
+[![Hugging Face Dataset](https://img.shields.io/badge/Hugging%20Face-Dataset-ffbe2f?logo=huggingface)](https://huggingface.co/datasets/cast42/x_likes_queries) [cast42/x_likes_queries](https://huggingface.co/datasets/cast42/x_likes_queries)
+
+The evaluation results are:
+
+#### Embedding Results (Colab CPU & GPU T4)
+
+| Model                                    | MRR   | Recall@5 | NDCG@5 | Wall Time (CPU) | Wall Time (GPU) |
+|------------------------------------------|-------|----------|--------|----------------|----------------|
+| sentence-transformers/all-MiniLM-L6-v2   | 0.6517 | 0.9246   | 0.3964 | 20s            | 4.09s         |
+| nomic-ai/modernbert-embed-base           | 0.6654 | **0.9472**   | **0.4044** | 3m01s          | 6.82s         |
+| intfloat/multilingual-e5-large           | **0.7063** | 0.9246   | 0.3823 | 7m57s          | 12.5s         |
+| minishlab/potion-retrieval-32M           | 0.6346 | 0.8894   | 0.3813 | **2s**             | **1.64s**         |
+
 ## Contributing
 
 All contributions are welcome, including more documentation, examples, code, and tests. Even questions.
