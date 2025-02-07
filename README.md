@@ -130,20 +130,22 @@ This approach is implemented in [search_x_likes/cosine_search.py](search_x_likes
 
 The code to generate the synthetic dataset with gpt-4o-mini is in [search_x_likes/generate_synthetic_eval_dataset.py](search_x_likes/generate_synthetic_eval_dataset.py)
 It uses input the dataset that contains the post on x that are liked:
-[![Hugging Face Dataset](https://img.shields.io/badge/Hugging%20Face-Dataset-ffbe2f?logo=huggingface)](https://huggingface.co/datasets/cast42/x_likes)
 
-[![Hugging Face Dataset](https://img.shields.io/badge/Hugging%20Face-Dataset-ffbe2f?logo=huggingface)](https://huggingface.co/datasets/cast42/x_likes_queries) [cast42/x_likes_queries](https://huggingface.co/datasets/cast42/x_likes_queries)
+- [![Hugging Face Dataset](https://img.shields.io/badge/Hugging%20Face-Dataset-ffbe2f?logo=huggingface)](https://huggingface.co/datasets/cast42/x_likes) [cast42/x_likes](https://huggingface.co/datasets/cast42/x_likes)
+
+- [![Hugging Face Dataset](https://img.shields.io/badge/Hugging%20Face-Dataset-ffbe2f?logo=huggingface)](https://huggingface.co/datasets/cast42/x_likes_queries) [cast42/x_likes_queries](https://huggingface.co/datasets/cast42/x_likes_queries)
 
 The evaluation results are:
 
-#### Embedding Results (Colab CPU & GPU T4)
+#### Retrieval Results (Colab CPU & GPU T4)
 
-| Model                                    | MRR   | Recall@5 | NDCG@5 | Wall Time (CPU) | Wall Time (GPU) |
-|------------------------------------------|-------|----------|--------|----------------|----------------|
-| sentence-transformers/all-MiniLM-L6-v2   | 0.6517 | 0.9246   | 0.3964 | 20s            | 4.09s         |
-| nomic-ai/modernbert-embed-base           | 0.6654 | **0.9472**   | **0.4044** | 3m01s          | 6.82s         |
-| intfloat/multilingual-e5-large           | **0.7063** | 0.9246   | 0.3823 | 7m57s          | 12.5s         |
-| minishlab/potion-retrieval-32M           | 0.6346 | 0.8894   | 0.3813 | **2s**             | **1.64s**         |
+| Model                                  | MRR        | Recall@5   | NDCG@5     | Wall Time (CPU) | Wall Time (GPU) |
+| -------------------------------------- | ---------- | ---------- | ---------- | --------------- | --------------- |
+| BM25s                                  | **0.7414** | 0.8090     | 0.3249     | **51ms**        | -               |
+| sentence-transformers/all-MiniLM-L6-v2 | 0.6517     | 0.9246     | 0.3964     | 20s             | 4.09s           |
+| nomic-ai/modernbert-embed-base         | 0.6654     | **0.9472** | **0.4044** | 3m01s           | 6.82s           |
+| intfloat/multilingual-e5-large         | 0.7063     | 0.9246     | 0.3823     | 7m57s           | 12.5s           |
+| minishlab/potion-retrieval-32M         | 0.6346     | 0.8894     | 0.3813     | **2s**          | **1.64s**       |
 
 ## Contributing
 
