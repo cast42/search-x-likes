@@ -7,11 +7,11 @@ readme = "README.md"
 keywords = ['python']
 requires-python = ">=3.10,<4.0"
 dependencies = [
-    "bm25s>=0.2.1",
+    "bm25s>=0.2.7",
     "openai>=1.48.0",
     "pandas-stubs>=2.2.2.240807",
     "pandas>=2.2.3",
-    "pystemmer>=2.2.0.1",
+    "pystemmer>=2.2.0.3",
     "textual>=0.81.0",
     "fastparquet>=2024.11.0",
     "scikit-learn>=1.6.0",

@@ -140,12 +140,12 @@ The evaluation results are:
 #### Retrieval Results (Colab CPU & GPU T4)
 
 | Model                                  | MRR        | Recall@5   | NDCG@5     | Wall Time (CPU) | Wall Time (GPU) |
-| -------------------------------------- | ---------- | ---------- | ---------- | ---------------:| --------------: |
-| BM25s                                  | **0.7414** | 0.8090     | 0.3249     | **0.2s**        | **0.4s**        |
-| sentence-transformers/all-MiniLM-L6-v2 | 0.6517     | 0.9246     | 0.3964     | 20s             | 4.09s           |
-| nomic-ai/modernbert-embed-base         | 0.6654     | **0.9472** | **0.4044** | 3m01s           | 6.82s           |
-| intfloat/multilingual-e5-large         | 0.7063     | 0.9246     | 0.3823     | 7m57s           | 12.5s           |
-| minishlab/potion-retrieval-32M         | 0.6346     | 0.8894     | 0.3813     | 2s              | 1.64s           |
+| -------------------------------------- | ---------- | ---------- | ---------- | --------------: | --------------: |
+| BM25s                                  | **0.7711** | 0.8367     | 0.3376     |        **0.2s** |        **0.4s** |
+| sentence-transformers/all-MiniLM-L6-v2 | 0.6517     | 0.9246     | 0.3964     |             20s |           4.09s |
+| nomic-ai/modernbert-embed-base         | 0.6654     | **0.9472** | **0.4044** |           3m01s |           6.82s |
+| intfloat/multilingual-e5-large         | 0.7063     | 0.9246     | 0.3823     |           7m57s |           12.5s |
+| minishlab/potion-retrieval-32M         | 0.6346     | 0.8894     | 0.3813     |              2s |           1.64s |
 
 ## Contributing
 
