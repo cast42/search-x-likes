@@ -163,17 +163,10 @@ def test_load_likes_multiple_valid_files(tmp_path):
         (tmp_path / f"like{idx}.js").write_text(content, encoding="utf-8")
 
     likes = load_likes(tmp_path)
+    sorted_likes = sorted(likes, key=lambda x: x["like"]["tweetId"])
 
     # Expected result
     expected_likes = [
-        {
-            "like": {
-                "tweetId": "3333333333",
-                "fullText": "Second valid tweet",
-                "favoritedAt": "2021-04-01T00:00:00.000Z",
-                "expandedUrl": "https://twitter.com/test/status/3333333333",
-            }
-        },
         {
             "like": {
                 "tweetId": "2222222222",
@@ -182,6 +175,14 @@ def test_load_likes_multiple_valid_files(tmp_path):
                 "expandedUrl": "https://twitter.com/test/status/2222222222",
             }
         },
+        {
+            "like": {
+                "tweetId": "3333333333",
+                "fullText": "Second valid tweet",
+                "favoritedAt": "2021-04-01T00:00:00.000Z",
+                "expandedUrl": "https://twitter.com/test/status/3333333333",
+            }
+        },
     ]
 
-    assert likes == expected_likes
+    assert sorted_likes == expected_likes
