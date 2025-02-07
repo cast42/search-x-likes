@@ -5,7 +5,7 @@ description = "Search posts from x that you have liked yourself usign the archiv
 authors = [{ name = "Lode Nachtergaele", email = "cast42@gmail.com" }]
 readme = "README.md"
 keywords = ['python']
-requires-python = ">=3.9,<4.0"
+requires-python = ">=3.10,<4.0"
 dependencies = [
     "bm25s>=0.2.1",
     "openai>=1.48.0",
