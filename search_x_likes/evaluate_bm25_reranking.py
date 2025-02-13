@@ -1,0 +1,156 @@
+import contextlib
+from collections.abc import Generator
+from time import perf_counter
+from typing import TypedDict
+
+import bm25s
+import numpy as np
+import Stemmer  # optional: for stemming
+import torch
+from datasets import load_dataset
+from sentence_transformers import SentenceTransformer, util
+from sklearn.metrics import ndcg_score
+
+from search_x_likes.list_likes_in_archive import load_likes
+
+DATA_DIRECTORY: str = "data"
+TOPK: int = 15  # Increased to 15
+
+
+class LikeInfo(TypedDict, total=False):
+    tweetId: str
+    fullText: str
+    favoritedAt: str
+    expandedUrl: str
+
+
+@contextlib.contextmanager
+def timer(subject: str = "time") -> Generator[None, None, None]:
+    """Print the elapsed time. (Only used in debugging)"""
+    start = perf_counter()
+    yield
+    elapsed = perf_counter() - start
+    elapsed_ms = elapsed * 1000
+    print(f"{subject} elapsed {elapsed_ms:.4f}ms")
+
+
+# 1. Mean Reciprocal Rank (MRR)
+def mean_reciprocal_rank(retrieved_docs: list[list[int]], ground_truths: list[int]) -> float:
+    """
+    Computes the Mean Reciprocal Rank (MRR) score.
+
+    MRR measures how well the first relevant document is ranked among the retrieved documents.
+
+    Args:
+        retrieved_docs (List[List[int]]): A list of lists, where each inner list contains the ranked document indices for a query.
+        ground_truths (List[int]): A list where each element represents the correct document index for a query.
+
+    Returns:
+        float: The MRR score, a value between 0 and 1.
+    """
+    ranks: list[float] = []
+    for i, retrieved in enumerate(retrieved_docs):
+        gt: int = ground_truths[i]
+        rank = np.where(np.array(retrieved) == gt)[0]
+        ranks.append(1 / (rank[0] + 1) if len(rank) > 0 else 0)
+    return float(np.mean(ranks))
+
+
+# 2. Recall@k
+def recall_at_k(retrieved_docs: list[list[int]], ground_truths: list[int], k: int) -> float:
+    """
+    Computes Recall@k, which checks whether the correct document appears in the top-k results.
+
+    Args:
+        retrieved_docs (list[list[int]]): A list of lists containing ranked document indices for each query.
+        ground_truths (list[int]): A list of the correct document indices for each query.
+        k (int): The cutoff for the number of retrieved documents to consider.
+
+    Returns:
+        float: Recall@k score, a value between 0 and 1.
+    """
+    recall: list[int] = []
+    for i, retrieved in enumerate(retrieved_docs):
+        recall.append(1 if ground_truths[i] in retrieved[:k] else 0)
+    return float(np.mean(recall))
+
+
+# 3. NDCG@k
+def ndcg_at_k(retrieved_docs: list[list[int]], ground_truths: list[int], k: int) -> float:
+    """
+    Computes Normalized Discounted Cumulative Gain (NDCG) at rank k.
+
+    NDCG rewards relevant documents appearing higher in the ranking.
+
+    Args:
+        retrieved_docs (list[list[int]]): A list of lists containing ranked document indices for each query.
+        ground_truths (list[int]): A list of correct document indices for each query.
+        k (int): The cutoff for the number of retrieved documents to consider.
+
+    Returns:
+        float: The NDCG@k score, a value between 0 and 1.
+    """
+    scores: list[float] = []
+    for i, retrieved in enumerate(retrieved_docs):
+        relevance: list[int] = [
+            1 if retrieved[j] == ground_truths[i] else 0 for j in range(min(k, len(retrieved)))
+        ]  # ensure not exceeding the length of retrieved
+        scores.append(ndcg_score([relevance], [list(range(min(k, len(retrieved))))]))  # Sklearn NDCG calculation
+    return float(np.mean(scores))
+
+
+if __name__ == "__main__":
+    stemmer = Stemmer.Stemmer("english")
+    likes: list[dict[str, LikeInfo]] = load_likes(DATA_DIRECTORY)
+    corpus_lst = [like_obj.get("like", {}).get("fullText", "") for like_obj in likes]
+    corpus_ids = list(range(len(likes)))
+    corpus_tokens = bm25s.tokenize(corpus_lst, stopwords="en", stemmer=stemmer)
+    # Create the BM25 model and index the corpus
+    retriever = bm25s.BM25()
+    retriever.index(corpus_tokens)
+    ds = load_dataset("cast42/x_likes_queries")
+
+    qids, queries_lst = corpus_ids, ds["train"]["query"]
+    corpus_tokens = bm25s.tokenize(corpus_lst, stemmer=stemmer, leave=False)
+
+    query_tokens = bm25s.tokenize(queries_lst, stemmer=stemmer, leave=False)
+
+    with timer("Retrieve relevant documents with BM25"):
+        queried_results, queried_scores = retriever.retrieve(query_tokens, corpus=corpus_ids, k=TOPK, n_threads=4)
+
+    ground_truths = [corpus_lst.index(full_text) for full_text in ds["train"]["full_text"]]
+
+    # Reranking with bi-encoder (Sentence Transformers)
+    # model_name = "all-mpnet-base-v2"  # Choose a suitable Sentence Transformer model.
+    # model_name = "sentence-transformers/all-MiniLM-L6-v2" # "sentence-transformers/all-MiniLM-L6-v2" is a good alternative.
+    # model_name = "minishlab/potion-retrieval-32M"
+    model_name = "nomic-ai/modernbert-embed-base"
+    model = SentenceTransformer(model_name)
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model = model.to(device)
+
+    reranked_results = []
+    with timer("Reranking with bi-encoder"):
+        for i, retrieved_ids in enumerate(queried_results):
+            query = queries_lst[i]
+            retrieved_texts = [corpus_lst[doc_id] for doc_id in retrieved_ids]
+            query_embedding = model.encode(query, convert_to_tensor=True).to(device)
+            document_embeddings = model.encode(retrieved_texts, convert_to_tensor=True).to(device)
+
+            # Calculate cosine similarities
+            similarities = util.cos_sim(query_embedding, document_embeddings)[0]
+
+            # Sort by similarity
+            doc_scores = list(zip(retrieved_ids, similarities.cpu().tolist()))
+            doc_scores = sorted(doc_scores, key=lambda x: x[1], reverse=True)
+            reranked_ids = [doc_id for doc_id, score in doc_scores]
+            reranked_results.append(reranked_ids)
+
+    mrr = mean_reciprocal_rank(reranked_results, ground_truths)
+    recall_5 = recall_at_k(reranked_results, ground_truths, k=5)
+    ndcg_5 = ndcg_at_k(reranked_results, ground_truths, k=5)
+
+    # Print results
+    print(f"MRR: {mrr:.4f}")
+    print(f"Recall@5: {recall_5:.4f}")
+    print(f"NDCG@5: {ndcg_5:.4f}")

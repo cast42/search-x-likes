@@ -70,7 +70,7 @@ class InputApp(App):
             highlight_text: str = highlight_query(full_text, query)
             expanded_url: str = like.get("expandedUrl", "N/A")
             if query in highlight_text:
-                search.append(f"❱ [{expanded_url}](expanded_url): " + highlight_text)
+                search.append(f"❱ [{expanded_url}](expanded_url) : " + highlight_text)
                 number_of_matches += 1
                 if number_of_matches > MAX_NUMBER_OF_MATCHES_SHOWN:
                     break

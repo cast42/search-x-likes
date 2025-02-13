@@ -82,6 +82,14 @@ Use `ruff` for linting and formatting, `mypy` for static code analysis, and `pyt
 
 The documentation is built with `mkdocs`, `mkdocs-material` and `mkdocstrings`.
 
+## Datasets
+
+To run uv run python search_x_likes/fix_datasets.py set:
+
+```
+export PYTORCH_ENABLE_MPS_FALLBACK=1
+```
+
 ## Search approaches
 
 ### Exact search
@@ -134,6 +142,8 @@ It uses input the dataset that contains the post on x that are liked:
 - [![Hugging Face Dataset](https://img.shields.io/badge/Hugging%20Face-Dataset-ffbe2f?logo=huggingface)](https://huggingface.co/datasets/cast42/x_likes) [cast42/x_likes](https://huggingface.co/datasets/cast42/x_likes)
 
 - [![Hugging Face Dataset](https://img.shields.io/badge/Hugging%20Face-Dataset-ffbe2f?logo=huggingface)](https://huggingface.co/datasets/cast42/x_likes_queries) [cast42/x_likes_queries](https://huggingface.co/datasets/cast42/x_likes_queries)
+- [![Hugging Face Dataset](https://img.shields.io/badge/Hugging%20Face-Dataset-ffbe2f?logo=huggingface)](https://huggingface.co/datasets/cast42/x_likes_embeddings_text_embedding_3_small) [cast42/x_likes_embeddings_text_embedding_3_small](https://huggingface.co/datasets/cast42/x_likes_embeddings_text_embedding_3_small)
+- [![Hugging Face Dataset](https://img.shields.io/badge/Hugging%20Face-Dataset-ffbe2f?logo=huggingface)](https://huggingface.co/datasets/cast42/x_likes_embeddings_potion_base_8M) [cast42/x_likes_embeddings_potion_base_8M](https://huggingface.co/datasets/cast42/x_likes_embeddings_potion_base_8M)
 
 The evaluation results are:
 
@@ -146,6 +156,19 @@ The evaluation results are:
 | nomic-ai/modernbert-embed-base         | 0.6654     | **0.9472** | **0.4044** |           3m01s |           6.82s |
 | intfloat/multilingual-e5-large         | 0.7063     | 0.9246     | 0.3823     |           7m57s |           12.5s |
 | minishlab/potion-retrieval-32M         | 0.6346     | 0.8894     | 0.3813     |              2s |           1.64s |
+| minishlab/potion-base-8M               | 0.6128     | 0.8794     | 0.3887     |            0.7s |           1.99s |
+| tomaarsen/static-retrieval-mrl-en-v1   | 0.5958     | 0.8543     | 0.3771     |           3.23s |           1.87s |
+
+Quality results with rerankers:
+
+| Model                                             | MRR        | Recall@5   | NDCG@5     |
+| ------------------------------------------------- | ---------- | ---------- | ---------- |
+| BM25s - no reranker                               | 0.7711     | 0.8367     | 0.3376     |
+| bi-encoder sentence-transformers/all-MiniLM-L6-v2 | 0.7106     | 0.7889     | 0.3243     |
+| bi-encoder all-mpnet-base-v2                      | 0.6778     | 0.7789     | 0.3315     |
+| bi-encoder minishlab/potion-retrieval-32M         | 0.5973     | 0.7638     | **0.3396** |
+| bi-encoder nomic-ai/modernbert-embed-base         | 0.7210     | 0.8065     | 0.3347     |
+| cross-encoder/ms-marco-MiniLM-L-6-v2              | **0.7958** | **0.8417** | 0.3347     |
 
 ## Contributing
 
@@ -158,3 +181,6 @@ The package is open-sourced under the conditions of the [MIT license](https://ch
 ---
 
 Repository initiated with [fpgmaas/cookiecutter-uv](https://github.com/fpgmaas/cookiecutter-uv).
+
+[![arXiv](https://img.shields.io/badge/arXiv-2203.05115-b31b1b.svg)](https://arxiv.org/abs/2203.05115)
+[![arXiv](https://img.shields.io/badge/arXiv-2407.03618-b31b1b.svg)](https://arxiv.org/abs/2407.03618)

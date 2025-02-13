@@ -128,7 +128,7 @@ class InputApp(App):
         docs = [
             f"❱ [https://x.com/i/web/status/{tweet_id}](https://x.com/i/web/status/{tweet_id}) : {result}"
             for tweet_id, result in zip(results["tweet_id"].values, results["full_text"].values)
-        ]
+        ][::-1]
 
         results_widget.update("\n\n".join(docs))
 
