@@ -121,10 +121,12 @@ if __name__ == "__main__":
     ground_truths = [corpus_lst.index(full_text) for full_text in ds["train"]["full_text"]]
 
     # Reranking with Hugging Face Cross-Encoder
-    model_name = "cross-encoder/ms-marco-MiniLM-L-6-v2"  # Choose a cross-encoder model.  "cross-encoder/nli-deberta-v3-small" is another good choice, potentially more accurate.
-    model_name = "sentence-transformers/all-MiniLM-L12-v2"
+    # model_name: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"  # Choose a cross-encoder model.  "cross-encoder/nli-deberta-v3-small" is another good choice, potentially more accurate.
+    model_name: str = "mixedbread-ai/mxbai-rerank-xsmall-v1"
+    # model_name: str = "mixedbread-ai/mxbai-rerank-base-v1"
+    # model_name: str = "mixedbread-ai/mxbai-rerank-large-v1"
     model = CrossEncoder(model_name)
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    device = "mps" if torch.cuda.is_available() else "cpu"
 
     reranked_results = []
     with timer("Reranking with Hugging Face Cross-Encoder"):

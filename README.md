@@ -161,14 +161,17 @@ The evaluation results are:
 
 Quality results with rerankers:
 
-| Model                                             | MRR        | Recall@5   | NDCG@5     |
-| ------------------------------------------------- | ---------- | ---------- | ---------- |
-| BM25s - no reranker                               | 0.7711     | 0.8367     | 0.3376     |
-| bi-encoder sentence-transformers/all-MiniLM-L6-v2 | 0.7106     | 0.7889     | 0.3243     |
-| bi-encoder all-mpnet-base-v2                      | 0.6778     | 0.7789     | 0.3315     |
-| bi-encoder minishlab/potion-retrieval-32M         | 0.5973     | 0.7638     | **0.3396** |
-| bi-encoder nomic-ai/modernbert-embed-base         | 0.7210     | 0.8065     | 0.3347     |
-| cross-encoder/ms-marco-MiniLM-L-6-v2              | **0.7958** | **0.8417** | 0.3347     |
+| Model                                              | MRR        | Recall@5   | NDCG@5     |
+| -------------------------------------------------- | ---------- | ---------- | ---------- |
+| BM25s - no reranker                                | 0.7711     | 0.8367     | 0.3376     |
+| bi-encoder sentence-transformers/all-MiniLM-L6-v2  | 0.7106     | 0.7889     | 0.3243     |
+| bi-encoder all-mpnet-base-v2                       | 0.6778     | 0.7789     | 0.3315     |
+| bi-encoder minishlab/potion-retrieval-32M          | 0.5973     | 0.7638     | 0.3396     |
+| bi-encoder nomic-ai/modernbert-embed-base          | 0.7210     | 0.8065     | 0.3347     |
+| cross encoder cross-encoder/ms-marco-MiniLM-L-6-v2 | **0.7958** | **0.8417** | 0.3347     |
+| corss encoder mixedbread-ai/mxbai-rerank-xsmall-v1 | 0.7836     | 0.8417     | **0.3422** |
+| cross encoder mixedbread-ai/mxbai-rerank-base-v1   | 0.7708     | 0.8417     | 0.3409     |
+| cross encoder mixedbread-ai/mxbai-rerank-large-v1  | 0.7605     | 0.8342     | 0.3362     |
 
 ## Contributing
 
