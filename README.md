@@ -11,6 +11,7 @@ Search posts from x that have liked yourself using the archive download files
 - **Github repository**: <https://github.com/cast42/search-x-likes/>
 - **Documentation** <https://cast42.github.io/search-x-likes/>
 - **Pypy package** <https://pypi.org/project/search-x-likes/>
+- [![Hugging Face Space](https://img.shields.io/badge/Hugging%20Face-Space-yellow?logo=huggingface)](https://huggingface.co/spaces/cast42/x_likes_search) <https://huggingface.co/spaces/cast42/x_likes_search/>
 
 ## Getting started with your project
 
