@@ -186,5 +186,7 @@ The package is open-sourced under the conditions of the [MIT license](https://ch
 
 Repository initiated with [fpgmaas/cookiecutter-uv](https://github.com/fpgmaas/cookiecutter-uv).
 
+## Interesting papers
+
 [![arXiv](https://img.shields.io/badge/arXiv-2203.05115-b31b1b.svg)](https://arxiv.org/abs/2203.05115)
 [![arXiv](https://img.shields.io/badge/arXiv-2407.03618-b31b1b.svg)](https://arxiv.org/abs/2407.03618)
