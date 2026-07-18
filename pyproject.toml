@@ -19,7 +19,7 @@ dependencies = [
     "datasets>=3.2.0",
     "torch>=2.6.0",
     "torchvision>=0.21.0",
-    "transformers==4.48.0",
+    "transformers==5.5.0",
     "model2vec>=0.3.8",
     "sentence-transformers>=3.4.1",
 ]
