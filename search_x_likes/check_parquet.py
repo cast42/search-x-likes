@@ -1,5 +1,8 @@
 # Python script to debug column types in parquet file
 
+from typing import cast
+
+import pandas as pd
 import pyarrow.parquet as pq
 from datasets import load_dataset
 
@@ -25,7 +28,7 @@ print(df.dtypes)
 dataset = load_dataset("cast42/x_likes", split="train")
 
 # Convert to Pandas DataFrame
-df = dataset.to_pandas()
+df = cast(pd.DataFrame, dataset.to_pandas(batched=False))
 
 # Inspect the DataFrame
 print(df.head())

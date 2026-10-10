@@ -23,7 +23,7 @@ class LikeInfo(TypedDict, total=False):
 
 
 @contextlib.contextmanager
-def timer(subject: str = "time") -> Generator[None, None, None]:
+def timer(subject: str = "time") -> Generator[None]:
     """Print the elapsed time. (Only used in debugging)"""
     start = perf_counter()
     yield

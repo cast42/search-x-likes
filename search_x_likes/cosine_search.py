@@ -9,6 +9,7 @@ import logging
 import os
 from collections.abc import Generator
 from time import perf_counter
+from typing import cast
 
 import numpy as np
 import openai
@@ -30,7 +31,7 @@ Timer context manager, only used in debug.
 
 
 @contextlib.contextmanager
-def timer(subject: str = "time") -> Generator[None, None, None]:
+def timer(subject: str = "time") -> Generator[None]:
     """Print the elapsed time. (Only used in debugging)"""
     start = perf_counter()
     yield
@@ -159,7 +160,7 @@ if __name__ == "__main__":
             # Fallback to loading the Hugging Face dataset
             dataset = load_dataset("cast42/x_likes", split="train")
             # Convert to Pandas DataFrame
-            df = dataset.to_pandas()
+            df = cast(pd.DataFrame, dataset.to_pandas(batched=False))
         except Exception as hf_e:
             print(f"Failed to load from Hugging Face dataset: {hf_e}")
             raise  # Reraise the exception after logging
