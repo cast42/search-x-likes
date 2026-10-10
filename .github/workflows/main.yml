@@ -22,10 +22,15 @@ jobs:
       - name: Set up the environment
         uses: ./.github/actions/setup-python-env
 
+      - name: Install just
+        uses: taiki-e/install-action@v2
+        with:
+          tool: just@1.53.0
+
       - name: Run checks
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: make check
+        run: just check
 
   tests-and-type-check:
     runs-on: ubuntu-latest

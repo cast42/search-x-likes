@@ -45,7 +45,7 @@ If you are proposing a new feature:
 # Get Started!
 
 Ready to contribute? Here's how to set up `search-x-likes` for local development.
-Please note this documentation assumes you already have `uv` and `Git` installed and ready to go.
+Please note this documentation assumes you already have `uv`, `just`, and `Git` installed and ready to go.
 
 1. Fork the `search-x-likes` repo on GitHub.
 
@@ -87,13 +87,13 @@ Now you can make your changes locally.
 7. When you're done making changes, check that your changes pass the formatting tests.
 
 ```bash
-make check
+just check
 ```
 
 Now, validate that all unit tests are passing:
 
 ```bash
-make test
+just test
 ```
 
 9. Before raising a pull request you should also run tox.

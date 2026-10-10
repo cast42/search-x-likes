@@ -39,10 +39,13 @@ could not be installed because PyTorch 2.14.1 has no Python 3.15 wheel or
 source distribution. Runtime support for 3.15 still needs to be tested after
 those distributions become available.
 
+Install [just](https://github.com/casey/just#installation) before running the project commands.
+On macOS, use `brew install just`. Run `just` to list the available recipes.
+
 Then, install the environment and the pre-commit hooks with
 
 ```bash
-make install
+just install
 ```
 
 This will also generate your `uv.lock` file
@@ -90,7 +93,7 @@ For more details, see [here](https://fpgmaas.github.io/cookiecutter-uv/features/
 ## Development
 
 Use `ruff` for linting and formatting, `ty` for type checking, and `pytest` for testing.
-Run `make check` for the repository checks, or `uv run ty check --python-version 3.15`
+Run `just check` for the repository checks, or `uv run ty check --python-version 3.15`
 to check the code against the next Python version without installing Python 3.15 dependencies.
 
 The documentation is built with `mkdocs`, `mkdocs-material` and `mkdocstrings`.
