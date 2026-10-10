@@ -16,7 +16,7 @@ class MissingTokenError(Exception):
 load_dotenv()
 
 
-def remove_column(dset: Dataset) -> Dataset:  # type: ignore
+def remove_column(dset: Dataset) -> Dataset:
     return dset.remove_columns(["embeddings"])
 
 
@@ -27,7 +27,7 @@ def main() -> None:
     if not hf_token:
         raise MissingTokenError()
 
-    dataset: DatasetDict = load_dataset("cast42/x_likes")  # type: ignore
+    dataset: DatasetDict = load_dataset("cast42/x_likes")
     # dataset.push_to_hub("cast42/x_likes_embeddings_text_embedding_3_small", token=hf_token)
 
     # print(
@@ -49,7 +49,7 @@ def main() -> None:
     print("Dataset successfully uploaded to: https://huggingface.co/datasets/cast42/x_likes_embeddings_potion_base_8M")
 
     # Remove the "embeddings" column
-    dataset_no_embeddings: DatasetDict = DatasetDict({split: remove_column(dset) for split, dset in dataset.items()})  # type: ignore
+    dataset_no_embeddings: DatasetDict = DatasetDict({split: remove_column(dset) for split, dset in dataset.items()})
 
     # Step 4: Push the modified dataset under a new name
     dataset_no_embeddings.push_to_hub("cast42/x_likes", token=hf_token)

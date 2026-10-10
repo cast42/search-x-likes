@@ -8,11 +8,10 @@ import logging
 import os
 import re
 import shutil
-from collections.abc import Callable
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import dataclass
 from datetime import date, datetime
-from typing import Any, Literal
+from typing import Any, Literal, Protocol
 
 # Logging setup
 logging.basicConfig(level=logging.INFO)
@@ -134,7 +133,10 @@ def extract_content(item: dict[str, Any], content_source: str, media_folder: str
     ]
 
 
-ExtractorType = Callable[[Any, str], list[Content]]
+class ExtractorType(Protocol):
+    __name__: str
+
+    def __call__(self, file_data: Any, media_folder: str, /) -> list[Content]: ...
 
 
 def process_file_wrapper(args: tuple[str, dict[str, Any], str, str]) -> list[Content]:
@@ -146,7 +148,7 @@ def process_file_wrapper(args: tuple[str, dict[str, Any], str, str]) -> list[Con
 
 
 def extract_content_data(
-    archive_path: str, file_info: dict[str, Any], extractor: Callable, media_folder: str
+    archive_path: str, file_info: dict[str, Any], extractor: ExtractorType, media_folder: str
 ) -> list[Content]:
     try:
         result: list[Content] = extractor(file_info["data"], media_folder)
@@ -157,7 +159,7 @@ def extract_content_data(
         return result
 
 
-def extract_data(archive_path: str, type_info: dict[str, Any], extractor: Callable) -> list[Content]:
+def extract_data(archive_path: str, type_info: dict[str, Any], extractor: ExtractorType) -> list[Content]:
     media_folder = os.path.join(archive_path, "data", "tweets_media")
     contents = []
     extractor_name = extractor.__name__
@@ -411,13 +413,13 @@ def save_tweets_by_date(
             logger.warning(f"Tweet missing date information: {tweet}")
             continue
         try:
-            date = datetime.strptime(date_str, "%a %b %d %H:%M:%S %z %Y").date()
-            tweets_by_date.setdefault(date, []).append(tweet)
+            tweet_date = datetime.strptime(date_str, "%a %b %d %H:%M:%S %z %Y").date()
+            tweets_by_date.setdefault(tweet_date, []).append(tweet)
         except ValueError:
             logger.warning(f"Invalid date format: {date_str}")
 
-    for date, tweets_on_date in tweets_by_date.items():
-        filename = f"{date.isoformat()}.md"
+    for tweet_date, tweets_on_date in tweets_by_date.items():
+        filename = f"{tweet_date.isoformat()}.md"
         file_path = os.path.join(output_dir, filename)
         tweets_on_date.sort(key=lambda x: x.timestamp)
         content = "\n\n---\n\n".join(

@@ -25,7 +25,7 @@ class LikeInfo(TypedDict, total=False):
 
 
 @contextlib.contextmanager
-def timer(subject: str = "time") -> Generator[None, None, None]:
+def timer(subject: str = "time") -> Generator[None]:
     """Print the elapsed time. (Only used in debugging)"""
     start = perf_counter()
     yield
@@ -104,16 +104,16 @@ if __name__ == "__main__":
     likes: list[dict[str, LikeInfo]] = load_likes(DATA_DIRECTORY)
     corpus_lst = [like_obj.get("like", {}).get("fullText", "") for like_obj in likes]
     corpus_ids = list(range(len(likes)))
-    corpus_tokens = bm25s.tokenize(corpus_lst, stopwords="en", stemmer=stemmer)
+    corpus_tokens = bm25s.tokenize(corpus_lst, stopwords="en", stemmer=stemmer.stemWords)
     # Create the BM25 model and index the corpus
     retriever = bm25s.BM25()
     retriever.index(corpus_tokens)
     ds = load_dataset("cast42/x_likes_queries")
 
     qids, queries_lst = corpus_ids, ds["train"]["query"]
-    corpus_tokens = bm25s.tokenize(corpus_lst, stemmer=stemmer, leave=False)
+    corpus_tokens = bm25s.tokenize(corpus_lst, stemmer=stemmer.stemWords, leave=False)
 
-    query_tokens = bm25s.tokenize(queries_lst, stemmer=stemmer, leave=False)
+    query_tokens = bm25s.tokenize(queries_lst, stemmer=stemmer.stemWords, leave=False)
 
     with timer("Retrieve relevant documents with BM25"):
         queried_results, queried_scores = retriever.retrieve(query_tokens, corpus=corpus_ids, k=TOPK, n_threads=4)

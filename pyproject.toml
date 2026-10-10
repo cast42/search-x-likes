@@ -5,16 +5,16 @@ description = "Search posts from x that you have liked yourself usign the archiv
 authors = [{ name = "Lode Nachtergaele", email = "cast42@gmail.com" }]
 readme = "README.md"
 keywords = ['python']
-requires-python = ">=3.10,<4.0"
+requires-python = ">=3.14,<4.0"
 dependencies = [
     "bm25s>=0.3.13",
     "openai>=3.28.0",
-    "pandas-stubs>=2.3.3.260113",
-    "pandas>=2.3.3",
+    "pandas-stubs>=3.0.5.260914",
+    "pandas>=3.0.6",
     "pystemmer>=3.1.0",
     "textual>=8.2.8",
     "fastparquet>=2026.9.0",
-    "scikit-learn>=1.7.2",
+    "scikit-learn>=1.9.1",
     "python-dotenv>=1.2.4",
     "datasets>=5.1.0",
     "torch>=2.14.1",
@@ -35,8 +35,6 @@ constraint-dependencies = [
     "aiohttp>=3.14.3",
     "fsspec>=2026.6.0",
     "virtualenv>=21.7.13",
-    # SciPy 1.15 wheels fail to load on Python 3.10 on Apple Silicon.
-    "scipy>=1.14.1,<1.15; python_version < '3.11' and sys_platform == 'darwin' and platform_machine == 'arm64'",
 ]
 
 [dependency-groups]
@@ -46,7 +44,7 @@ dev = [
     "pre-commit>=4.6.2",
     "tox-uv>=1.36.1",
     "deptry>=0.25.1",
-    "mypy>=2.4.0",
+    "ty>=0.0.86",
     "pytest-cov>=7.1.0",
     "ruff>=0.17.0",
     "mkdocs>=1.6.1",
@@ -61,22 +59,21 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools]
 packages = ["search_x_likes"]
 
-[tool.mypy]
-files = ["search_x_likes"]
-disallow_untyped_defs = "True"
-disallow_any_unimported = "True"
-no_implicit_optional = "True"
-check_untyped_defs = "True"
-warn_return_any = "True"
-warn_unused_ignores = "True"
-show_error_codes = "True"
-ignore_missing_imports = "True"
+[tool.ty.environment]
+python-version = "3.14"
+extra-paths = ["typings"]
+
+[tool.ty.src]
+include = ["search_x_likes", "tests"]
+
+[tool.ty.analysis]
+respect-type-ignore-comments = false
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
 [tool.ruff]
-target-version = "py310"
+target-version = "py314"
 line-length = 120
 fix = true
 
@@ -119,8 +116,6 @@ ignore = [
     "E501",
     # DoNotAssignLambda
     "E731",
-    # type: ignore  # noqa: PGH003
-    "PGH003"
 ]
 
 [tool.ruff.lint.per-file-ignores]

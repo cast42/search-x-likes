@@ -57,7 +57,7 @@ class InputApp(App):
         if len(query) < 4:
             return
         query = query.strip()
-        query_tokens = bm25s.tokenize(query, stemmer=stemmer)
+        query_tokens = bm25s.tokenize(query, stemmer=stemmer.stemWords)
         results_widget: tw.Markdown = self.query_one(tw.Markdown)
         if len(query_tokens) < 1:  # Do not retrieve when there are no tokens (e.g. word is a stopword)
             results_widget.update("")
@@ -78,7 +78,7 @@ if __name__ == "__main__":
     stemmer = Stemmer.Stemmer("english")
     likes: list[dict[str, LikeInfo]] = load_likes(DATA_DIRECTORY)
     corpus = [like_obj.get("like", {}).get("fullText", "") for like_obj in likes]
-    corpus_tokens = bm25s.tokenize(corpus, stopwords="en", stemmer=stemmer)
+    corpus_tokens = bm25s.tokenize(corpus, stopwords="en", stemmer=stemmer.stemWords)
     # Create the BM25 model and index the corpus
     retriever = bm25s.BM25()
     retriever.index(corpus_tokens)
