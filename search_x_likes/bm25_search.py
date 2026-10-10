@@ -64,7 +64,7 @@ class InputApp(App):
             return
 
         # Get top-k results as a tuple of (doc ids, scores). Both are arrays of shape (n_queries, k)
-        results, scores = retriever.retrieve(query_tokens, corpus=corpus, k=MAX_NUMBER_OF_MATCHES_SHOWN)
+        results, _scores = retriever.retrieve(query_tokens, corpus=corpus, k=MAX_NUMBER_OF_MATCHES_SHOWN)
 
         # Retrieve the found documents and update the markdown
         docs = [f"❱ {results[0, i]}" for i in range(results.shape[1])]

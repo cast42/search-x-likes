@@ -141,7 +141,7 @@ if __name__ == "__main__":
             similarities = util.cos_sim(query_embedding, document_embeddings)[0]
 
             # Sort by similarity
-            doc_scores = list(zip(retrieved_ids, similarities.cpu().tolist()))
+            doc_scores = list(zip(retrieved_ids, similarities.cpu().tolist(), strict=False))
             doc_scores = sorted(doc_scores, key=lambda x: x[1], reverse=True)
             reranked_ids = [doc_id for doc_id, score in doc_scores]
             reranked_results.append(reranked_ids)

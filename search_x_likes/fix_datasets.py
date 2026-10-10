@@ -4,7 +4,7 @@ from typing import Any
 from datasets import Dataset, DatasetDict, load_dataset
 from dotenv import load_dotenv
 from sentence_transformers import SentenceTransformer
-from sentence_transformers.models import StaticEmbedding
+from sentence_transformers.sentence_transformer.modules import StaticEmbedding
 
 
 class MissingTokenError(Exception):

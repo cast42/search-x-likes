@@ -142,7 +142,7 @@ if __name__ == "__main__":
                 scores = model.predict(pairs, batch_size=32, show_progress_bar=False, num_workers=0)
 
             # Sort retrieved IDs based on cross-encoder scores
-            doc_scores = list(zip(retrieved_ids, scores.tolist()))
+            doc_scores = list(zip(retrieved_ids, scores.tolist(), strict=False))
             doc_scores = sorted(doc_scores, key=lambda x: x[1], reverse=True)
             reranked_ids = [doc_id for doc_id, score in doc_scores]
             reranked_results.append(reranked_ids)
