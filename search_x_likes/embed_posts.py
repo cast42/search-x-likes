@@ -77,9 +77,7 @@ def main() -> None:
         for i in range(0, len(full_texts), batch_size):
             batch = full_texts[i : i + batch_size]
             response = client.embeddings.create(input=batch, model=EMBEDDING_MODEL)
-            response_dict = response.to_dict() if hasattr(response, "to_dict") else response
-            if isinstance(response_dict, dict) and "data" in response_dict:
-                embeddings.extend([item["embedding"] for item in response_dict["data"]])
+            embeddings.extend(item.embedding for item in response.data)
             progress.update(task, advance=batch_size)
 
     data = {

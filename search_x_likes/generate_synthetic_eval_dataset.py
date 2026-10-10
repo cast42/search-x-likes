@@ -136,7 +136,7 @@ def main() -> None:
     ) as progress:
         task = progress.add_task("", total=NUM2PROCESS)
 
-        for post, post_id in zip(liked_posts[:NUM2PROCESS], ids[:NUM2PROCESS]):
+        for post, post_id in zip(liked_posts[:NUM2PROCESS], ids[:NUM2PROCESS], strict=False):
             response_data = generate_search_queries(client, post)
 
             if response_data and response_data.queries:

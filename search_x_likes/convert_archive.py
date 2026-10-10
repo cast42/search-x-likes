@@ -8,10 +8,11 @@ import logging
 import os
 import re
 import shutil
+from collections.abc import Callable
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import dataclass
 from datetime import date, datetime
-from typing import Any, Callable, Literal, Optional
+from typing import Any, Literal
 
 # Logging setup
 logging.basicConfig(level=logging.INFO)
@@ -32,7 +33,7 @@ class Content:
     text: str
     metadata: dict[str, Any]
     timestamp: str
-    parent_id: Optional[str]
+    parent_id: str | None
     media_files: list[dict[str, Any]]
     content_source: str
 
@@ -230,7 +231,7 @@ def extract_archive_data(archive_path: str) -> dict[str, list[Content]]:
 
 
 # Data transformation functions
-def clean_text(text: str, entities: Optional[dict] = None) -> str:
+def clean_text(text: str, entities: dict | None = None) -> str:
     if entities:
         for url in entities.get("urls", []):
             short_url = url.get("url", "")
@@ -277,7 +278,7 @@ def trim_conversation_to_last_assistant(conversation_data: list[Message]) -> lis
 
 def get_conversation_data(conversation: list[Content]) -> list[Message]:
     conversation_data: list[Message] = []
-    current_role: Optional[Literal["assistant", "user"]] = None
+    current_role: Literal["assistant", "user"] | None = None
     current_content: list[str] = []
 
     for text, role in get_conversation_texts(conversation):

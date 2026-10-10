@@ -29,6 +29,14 @@ git push -u origin main
 
 ### 2. Set Up Your Development Environment
 
+Use Python 3.12 and uv 0.13.0 or newer for development. Python 3.12 remains
+the default in CI and Docker. Python 3.15.0 was checked on October 10, 2026,
+but the dependencies could not be installed because PyTorch 2.14.1 has no
+Python 3.15 wheel or source distribution.
+
+On Python 3.10 on Apple Silicon, uv selects SciPy 1.14.1 because the SciPy
+1.15 wheels fail to load. Other platforms use the latest compatible release.
+
 Then, install the environment and the pre-commit hooks with
 
 ```bash
@@ -98,7 +106,7 @@ export PYTORCH_ENABLE_MPS_FALLBACK=1
 Retrieve the first k exact matches. This approach is implemented as a textual TUI in [search_x_likes/exact_search.py](search_x_likes/exact_search.py)
 
 ```python
-k = 5 # retrieve k documents
+k = 5  # retrieve k documents
 retrieved = []
 for idx, document in enumerate(documents):
     if query in document:

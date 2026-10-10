@@ -7,6 +7,10 @@ import pytest
 
 from search_x_likes.embed_posts import get_embedding
 
+pytestmark = pytest.mark.skipif(
+    not os.environ.get("OPENAI_API_KEY"), reason="Live embedding tests require OPENAI_API_KEY"
+)
+
 
 def test_empty_text():
     api_key: str = os.environ.get("OPENAI_API_KEY", "<your OpenAI API key if not set as env var>")
