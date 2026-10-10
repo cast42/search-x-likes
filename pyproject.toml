@@ -30,6 +30,12 @@ Repository = "https://github.com/cast42/search-x-likes"
 Documentation = "https://cast42.github.io/search-x-likes/"
 
 [tool.uv]
+# Keep transitive dependencies above the patched Dependabot versions.
+constraint-dependencies = [
+    "aiohttp>=3.14.3",
+    "fsspec>=2026.6.0",
+    "virtualenv>=21.7.13",
+]
 dev-dependencies = [
     "pytest>=7.2.0",
     "pre-commit>=2.20.0",
