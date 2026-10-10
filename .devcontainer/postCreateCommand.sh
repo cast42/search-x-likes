@@ -1,8 +1,10 @@
 #! /usr/bin/env bash
 
+set -euo pipefail
+
 # Install uv
-curl -LsSf https://astral.sh/uv/install.sh | sh
-source $HOME/.cargo/env
+curl -LsSf https://astral.sh/uv/0.13.0/install.sh | sh
+export PATH="$HOME/.local/bin:$PATH"
 
 # Install Dependencies
 uv sync

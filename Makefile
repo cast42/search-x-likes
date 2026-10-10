@@ -10,8 +10,9 @@ check: ## Run code quality tools.
 	@uv sync --locked
 	@echo "🚀 Linting code: Running pre-commit"
 	@uv run pre-commit run -a
-	@echo "🚀 Static type checking: Running mypy"
-	@uv run mypy
+	@echo "🚀 Static type checking: Running ty for Python 3.14 and 3.15"
+	@uv run ty check
+	@uv run ty check --python-version 3.15
 #	@echo "🚀 Checking for obsolete dependencies: Running deptry"
 #	@uv run deptry .
 

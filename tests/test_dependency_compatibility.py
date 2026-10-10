@@ -25,7 +25,7 @@ def test_bm25_search_with_updated_textual(monkeypatch):
     corpus = ["Python dependency updates", "Train travel", "Coffee beans", "Garden plants", "Mountain walks"]
     stemmer = Stemmer.Stemmer("english")
     retriever = bm25s.BM25()
-    retriever.index(bm25s.tokenize(corpus, stopwords="en", stemmer=stemmer))
+    retriever.index(bm25s.tokenize(corpus, stopwords="en", stemmer=stemmer.stemWords))
     monkeypatch.setattr(bm25_search, "likes", [{"like": {"fullText": text}} for text in corpus], raising=False)
     monkeypatch.setattr(bm25_search, "corpus", corpus, raising=False)
     monkeypatch.setattr(bm25_search, "stemmer", stemmer, raising=False)
